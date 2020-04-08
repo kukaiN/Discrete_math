@@ -99,3 +99,24 @@ def find_shortest_vector(dimensions, basis):
 
 def use_LLL_to_solve_cryptyography(basis, num):
     pass
+
+def simplex_method():
+    pass
+
+def interior_angle_method():
+    pass
+
+def elipsodic_method():
+    pass
+
+def projective_method():
+    pass
+
+def input_sparsity_method():
+    pass
+
+def matrix_multi_method():
+    pass
+
+def transpose(constraints):
+    return [[value for value in constraints[j]] for j in range(len(constraints))]
