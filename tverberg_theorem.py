@@ -36,7 +36,10 @@ def grahams_method(set_of_points, list_size, min_x = None, max_x = None, sorted=
     absolute_points = [point for point in set_of_points if point != starting_point]
     relative_points = [[coor[0]-x_coor, coor[1]-y_coor] for coor in absolute_points]
     angles = [np.arccos(np.dot(base_vec, vec/np.linalg.norm(vec))) for vec in relative_points]
-    angles_and_coor = [[ang, coor] for ang, coor in zip(angles, absolute_points)]
+    angles_and_coor = [(ang, coor) for ang, coor in zip(angles, absolute_points)]
+    angle_dict = dict()
+    for ang, coor in angles_and_coor:
+        
     angles_and_coor.sort(key = lambda a: a[0])
     print([a[0] for a in angles_and_coor])
     stack = [starting_point]
