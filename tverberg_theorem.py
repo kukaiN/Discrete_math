@@ -14,49 +14,57 @@ def new_set_of_points(min_num, max_num, num_of_points,  dimensions=2):
         pass    
 
 
-def ccw(base_point, p1, p2):
-    # use the cross product to get z value and check the sign
-    return (p1[0]-base_point[0])*(p2[1]-base_point[1]) - (p1[1]-base_point[1])*(p2[0]-base_point[0])
+def CCW_from_determinant(point1, point2, point3):
+    return (point1[0]-point2[0])*(point3[1]-point2[1]) - (point1[1]-point2[1])*(point3[0]-point2[0])
+    
 
+def get_distance(point1, point2):
+    return abs(point1[0]-point2[0]) + abs(point1[1]-point2[1])
 
-
-
+def find_angle(point_list, lowest_point):
+    low_x, low_y = lowest_point
+    return [(math.atan2(point[1]-low_y, point[0]-low_x), point) for point in point_list]
 
 def grahams_method(set_of_points, list_size, min_x = None, max_x = None, sorted=True):
-    if not sorted:
-        set_of_points.sort(key= lambda a: a[1])
-    smallest_point = min(set_of_points, key=lambda a: a[1])
-    smallest_y = smallest_point[1]
-    candidates = [tup for tup in set_of_points if tup[1] == smallest_y]
-    candidates.sort(key = lambda a: a[0])
-    candidates.reverse()
-    starting_point = candidates[0]    
-    x_coor, y_coor  = starting_point
-    base_vec = [1, 0]
-    absolute_points = [point for point in set_of_points if point != starting_point]
-    relative_points = [[coor[0]-x_coor, coor[1]-y_coor] for coor in absolute_points]
-    angles = [np.arccos(np.dot(base_vec, vec/np.linalg.norm(vec))) for vec in relative_points]
-    angles_and_coor = [(ang, coor) for ang, coor in zip(angles, absolute_points)]
-    angle_dict = dict()
-    for ang, coor in angles_and_coor:
-        
-    angles_and_coor.sort(key = lambda a: a[0])
-    print([a[0] for a in angles_and_coor])
-    stack = [starting_point]
-    for coor in angles_and_coor:
-        while len(stack) > 1 and ccw(stack[-2], starting_point, stack[-1]) < 0:
+    lowest_y = min(set_of_points, key = lambda a: a[1])[1]
+    points_with_lowest_y = [point for point in set_of_points if point[1] == lowest_y]
+    points_with_lowest_y.sort(key= lambda a: a[0])
+    smallest_point = points_with_lowest_y[0]
+    angles_and_points = find_angle(set_of_points, smallest_point)
+    angles_dict = dict()
+    print(smallest_point)
+    for item in angles_and_points:
+        value = angles_dict.get(item[0], None)
+        if value == None: angles_dict[item[0]] = item[1]
+        elif get_distance(smallest_point, item[1]) > get_distance(smallest_point, value):
+            print(angles_dict[item[0]], item)
+            angles_dict[item[0]] = item[1]
+        else:
+            print(angles_dict[item[0]], item)
+    angle_list = [(key, value) for key, value in angles_dict.items()]
+    angle_list.sort(key = lambda a: a[0])
+    print(angle_list)
+    print(len(angle_list))
+    stack = []
+    for point in angle_list:
+        while len(stack)>1 and CCW_from_determinant(stack[-1], stack[-2], point[1]) < 0:
             del stack[-1]
-        stack.append(coor[1])
-        print(stack)
+        stack.append(point[1])
+    print(stack)
+    new_stack = [smallest_point]+stack+[smallest_point]
+    visual.visualize(set_of_points, new_stack, 2, maxVal=max_x, minVal=min_x, angles=False, min_point=smallest_point)
 
-    visual.visualize(set_of_points, stack, 2, maxVal=max_x, minVal=min_x)
 
-num_of_points = 12
-min_x, max_x = 0 , 30 
-stuff = [(random.randint(min_x, max_x), random.randint(min_x, max_x)) for _ in range(num_of_points)]
-stuff = list(set(stuff))
-print(stuff)
-grahams_method(stuff, num_of_points,min_x, max_x, sorted=False)
+def main():
+    num_of_points = 20
+    min_x, max_x = 0 , 40 
+    stuff = [(random.randint(min_x, max_x), random.randint(min_x, max_x)) for _ in range(num_of_points)]
+    stuff = list(set(stuff))
+    print(stuff)
+    grahams_method(stuff, num_of_points,min_x, max_x, sorted=False)
+
+
+
 
 
 def check_tverberg(list_of_points, num_of_points):
@@ -70,11 +78,6 @@ def check_size(list_of_points, size):
     # returns the bool of the size and the size after hashing
     return len(set(list_of_points)) == size 
 
-def main():
-    max_num = 7
-    min_num = 0
-    dimensions = 2
-    num_of_points = 5
     #for a in check_tverberg(set_of_points(min_num, max_num, dimensions, num_of_points), num_of_points):
     #    pass
     print("finished")

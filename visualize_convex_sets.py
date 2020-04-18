@@ -3,7 +3,7 @@ import numpy as np
 import random
 import itertools
 
-def visualize(points, convex_border, dimensions, maxVal=None, minVal=None, linestyles=["r.","b-", "rx"], ticks=[5, 1]):
+def visualize(points, convex_border, dimensions, maxVal=None, minVal=None, linestyles=["r.","b-", "rx"], ticks=[5, 1], angles=False, min_point = [0,0]):
     if maxVal == None: maxVal = max(max(points, key = lambda a: a[0]), max(points, key = lambda a: a[1]))
     if minVal == None: minVal = min(min(points, key = lambda a: a[0]), min(points, key = lambda a: a[1]))
     
@@ -22,6 +22,11 @@ def visualize(points, convex_border, dimensions, maxVal=None, minVal=None, lines
     plt.plot(x_points, y_points, linestyles[0])
     plt.plot(conv_x_points, conv_y_points, linestyles[1])
     plt.plot(conv_x_points, conv_y_points, linestyles[2])
+    if angles:
+        for x, y in zip(x_points, y_points):
+            x_list = [min_point[0], x]
+            y_list = [min_point[1], y]
+            plt.plot(x_list, y_list, "--r")
     plt.show()
 
 
