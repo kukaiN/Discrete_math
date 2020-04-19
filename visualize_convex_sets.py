@@ -9,6 +9,9 @@ def visualize(points, convex_border, dimensions, maxVal=None, minVal=None, lines
     
     fig = plt.figure()
     ax = fig.add_subplot(1, 1, 1)
+    if other_point:
+        minVal = min(minVal, min(point_considered))
+        maxVal= max(maxVal+1, max(point_considered))
     major_ticks = np.arange(minVal, maxVal+1, ticks[0])
     minor_ticks = np.arange(minVal, maxVal+1, ticks[1])
     ax.set_xticks(major_ticks)
@@ -27,8 +30,8 @@ def visualize(points, convex_border, dimensions, maxVal=None, minVal=None, lines
             x_list = [min_point[0], x]
             y_list = [min_point[1], y]
             plt.plot(x_list, y_list, "--r")
-    if point_in_consideration != None:
-        plt.plot(point_in_consideration[0], point_in_consideration[1], "yx")
+    if other_point:
+        plt.plot(point_considered[0], point_considered[1], "yx")
     plt.show()
 
 

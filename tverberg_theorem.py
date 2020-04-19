@@ -61,10 +61,11 @@ def in_hull(convex_set, x):
 
 def main():
 
-    num_of_points = 5
-    min_x, max_x = 0 , 5
+    num_of_points = 10
+    min_x, max_x = 0 , 10
     dimensions = 2
-    for i in range(10):
+    repetition = 10
+    for i in range(repetition):
         stuff = list(set((random.randint(min_x, max_x), random.randint(min_x, max_x)) for _ in range(num_of_points)))
         exterior_set, smallest_point = grahams_method(stuff, num_of_points,min_x, max_x, list_sorted=False)
     
@@ -72,9 +73,9 @@ def main():
         #convex_set = np.random.rand(num_of_points, 2)
         #point_in_set = np.random.rand(dimensions)
         convex_set = np.array(stuff)
-        point_in_set = np.array([10,10])
+        point_in_set = np.random.randint(max_x+1, size=2)
         print(in_hull(convex_set, point_in_set))
-        visual.visualize(stuff, exterior_set, 2, maxVal=max_x, minVal=min_x, angles=False, min_point=smallest_point, point_in_consideration=point_in_set)
+        visual.visualize(stuff, exterior_set, 2, maxVal=max_x, minVal=min_x, angles=False, min_point=smallest_point, other_point=True, point_considered=point_in_set)
     """
     import time
 
