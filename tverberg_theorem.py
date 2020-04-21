@@ -6,6 +6,10 @@ import scipy.optimize as sci_op
 import random
 import matplotlib.pyplot as plt
 import visualize_convex_sets as visual
+import os
+import pickle
+import pandas as pd
+import time
 
 def set_of_points(min_num, max_num, dimensions, num_of_points):
     return combinations(product(range(min_num, max_num+1), repeat=dimensions), num_of_points)
@@ -45,37 +49,81 @@ def grahams_method(set_of_points, list_size, min_x = None, max_x = None, list_so
         stack.append(point[1])
     new_stack = [smallest_point]+stack+[smallest_point]
     return (new_stack, smallest_point)
-    
-
-
 
 def in_hull(convex_set, x):
     set_size = len(convex_set)
-    dimension =len(x)
+    #dimension =len(x)
     c=np.zeros(set_size)
     A = np.r_[convex_set.T, np.ones((1, set_size))]
     b = np.r_[x, np.ones(1)]
     lp = sci_op.linprog(c, A_eq=A, b_eq=b)
     return lp.success
 
+def save_pickle(filepath, content):
+    content.to_pickle(filepath)
+
+def load_pickle(filepath, default):
+    """load an existing pickle file or make a pickle with default data and return the pickled data"""
+    try:
+        with open(filepath, "rb") as f:
+            x = pickle.load(f)
+    except Exception:
+        x = default
+        with open(path, "wb") as f:
+            pickle.dump(x, f)
+    return x
+
+def get_cd():
+    scriptpath, filename = os.path.realpath(__file__), "" 
+    for i in range(1,len(scriptpath)+1):
+        if scriptpath[-i] == "\\":
+            scriptpath = scriptpath[0:-i]
+            break
+    if os.getcwd() != scriptpath: filename = scriptpath + "\\"
+    return filename
 
 def main():
-
+    current_dir = get_cd()
     num_of_points = 10
-    min_x, max_x = 0 , 10
+    min_x, max_x = 0 , 7
     dimensions = 2
     repetition = 10
+    pickle_name = current_dir+"tverberg"
+    pickle_type = ".pkl"
+    """
     for i in range(repetition):
         stuff = list(set((random.randint(min_x, max_x), random.randint(min_x, max_x)) for _ in range(num_of_points)))
         exterior_set, smallest_point = grahams_method(stuff, num_of_points,min_x, max_x, list_sorted=False)
-    
-        
+ 
         #convex_set = np.random.rand(num_of_points, 2)
         #point_in_set = np.random.rand(dimensions)
         convex_set = np.array(stuff)
         point_in_set = np.random.randint(max_x+1, size=2)
+
         print(in_hull(convex_set, point_in_set))
-        visual.visualize(stuff, exterior_set, 2, maxVal=max_x, minVal=min_x, angles=False, min_point=smallest_point, other_point=True, point_considered=point_in_set)
+        #visual.visualize(stuff, exterior_set, 2, maxVal=max_x, minVal=min_x, angles=False, min_point=smallest_point, other_point=True, point_considered=point_in_set)
+    """
+    max_x = 8
+    number_of_points = 4
+    t1 = time.time()
+    points_Z2 = {(i, j) for i in range(max_x+1) for j in range(max_x+1)} 
+    data_points = []
+    #print(list(set_of_points(min_x, max_x, 2, number_of_points)))
+    for i in (set_of_points(min_x, max_x, 2,  number_of_points)):
+        if not ((0, 0) in i):
+            candidate_set = [(0, 0)] + list(i)  
+            break_bool = True
+            for point in points_Z2 - set(candidate_set):
+                if in_hull(np.array(candidate_set), np.array(point)):
+                    break_bool = False
+                    break
+            if break_bool:
+                data_points.append(candidate_set)
+    if data_points != []:
+        df = pd.DataFrame(data_points, columns=["p1", "p2", "p3", "p4", "p5"])
+        save_pickle(pickle_name+".pkl", df)
+    time_took = t1-time.time() 
+    print(time_took)
     """
     import time
 
