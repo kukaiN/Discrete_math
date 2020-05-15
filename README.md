@@ -81,7 +81,7 @@ then the growth factor of the original problem (2^n)  * (LL^2 choose n-2) * (1/2
 
 
 2^7 = 128
-| LL size | grid size | # of points removed with the t/s method | # of test cases | # number of operations (# of test cases * 128) | % of points saved by t/s method | 
+| LL size | grid size | # of points removed with the t/s method | # of test cases | # number of operations (# of test cases * 128) ** 2^7 = 128| % of points saved by t/s method | 
 |---------|----------|-----------------|----------|----------|-----|
 | 4         | 25 | 5 | 52,414 | 6,708,992 | 5/25 = 20% |
 | 5         | 36 | 9 | 546,017 | 69,890,176 | 9/36 = 25% |
@@ -89,3 +89,40 @@ then the growth factor of the original problem (2^n)  * (LL^2 choose n-2) * (1/2
 | 7         | 64 | 17 | 22,694,492 | 2,904,894,976 | 27% |
 | 8         | 81 | 20 | 109,544,061 | 14,021,639,808 | 24% |
 | 9         | 100 | 28 | ... | ... | 28% | 
+
+the 128 exist to represent the number of 2 partitions possible, we dont care about cases with 1 point and 6 point being a partitions (reasoning somewhere), but we keep 128 as an upperbound of the calculation
+
+- for each opperations above we need to do find the border of the partitioned convex set, which is O(logn * n) using Andrew's monotone chain algorithm
+- then we use the algorithm (1) designed below that takes O(log n) to check if a point p is in the convex set or not
+- Let A and B be the two partitioned set, We can reduce the number of points to check by finding the boundary of a smaller grid where the intersection would be if it exist (min( max Ax, max Bx) , min( max Ay, max By) , max( min Ax, min Bx) , max( min Ay, min By))
+- then iterate the grid and check membership with set A, keep the integer points in set A, call it Set_A
+- then iterate Set_A and check membership with B to check tolerance
+
+calculation 
+-  there are 128 ways to partition 7 points 
+- (LL^2)/2 ways of choosing two fixed point on the bounded LL x LL grid 
+- (LL^2 choose 5) ways of getting 5 points from the LL x LL grid
+- for each partition, takes O(n * log n) to find the set's boundary
+- O(log n) to check membership of a point
+- multiply by a small consant factor for the grid made by searching for the intersection
+
+after multiplying all of the above, we get  (2^n)  * (LL^2 choose n-2) * (1/2 * n^2)  *  ( O(n * log n) * LL^1.5 (log n))
+
+
+
+## Algorithm explanation:
+
+### Andrew's monotone chain
+sort points by the coordinate, then find the top part of the hull, then find the bottom border of the hull, then join the border
+similar to graham's scan, but since we dont have to calculate the angle, this is faster.
+the runtime of O(n * log n) comes from the sorting, if the points are sorted, then it is easy to find the next point that makes the top or bottom border
+
+### algorithm (1) , I dont know the name for this
+draw a line from one point on the convex hull to the point, p, that we want to check membership. 
+
+* the cross product's sign tells us if the second vector is on the left or the right of the vector
+
+we use the fact above to do a divide and conquer algorithm to find the 3 points on the set, that makes a triangle, then check if the point in question is on the same direction for all 3 sides
+
+the divide and conquer decreases the number of test cases by 2 at each step so the runtime is O(log n)
+
