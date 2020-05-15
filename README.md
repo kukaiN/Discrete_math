@@ -56,8 +56,9 @@ Example of the LL* LL/2 grid: ( entries will be a matrix that points to a smalle
 
 ## search space
 since the search space is going to be the shape below, we will use two generators,
- one for the points in the square and one for the skewed trapezoidal shape
-    
+one for the points in the square and one for the skewed trapezoidal shape
+
+This method will be abbreviated as the t/s method, standing for trapezoid/square method for saving computation
     6    __________________
     5   |                /
     4   |              /    
@@ -80,7 +81,7 @@ then the growth factor of the original problem (2^n)  * (LL^2 choose n-2) * (1/2
 
 
 2^7 = 128
-| LL size | grid size | number of points removed with the trapezoid/square method | # of test cases | # number of operations (# of test cases * 128) | % of points saved by trapezoid/square method | 
+| LL size | grid size | # of points removed with the t/s method | # of test cases | # number of operations (# of test cases * 128) | % of points saved by t/s method | 
 |---------|----------|-----------------|----------|----------|-----|
 | 4         | 25 | 5 | 52,414 | 6,708,992 | 5/25 = 20% |
 | 5         | 36 | 9 | 546,017 | 69,890,176 | 9/36 = 25% |
