@@ -17,10 +17,10 @@ for the integer tvergberg tolerance problem there are 4 + 1 parameters (the addi
 
 
 there are few functions that we need to define:
-    1. ) generate the points that is simple enough and minimizes the number of different orientations and doesnt include sets that are of a smaller case (brute force)
-    2. ) make a boolean matrix that differentiate the exaples and non-examples, also the matrix have to be stored in an efficient way
-    3. ) its required to build the base case before computing a matrix of a bigger magnitude (idea from DP)
-    4. ) ***effiecient method of checking the tolerance given n points (currently brute force, maybe theres a better method)
+1. ) generate the points that is simple enough and minimizes the number of different orientations and doesnt include sets that are of a smaller case (brute force)
+2. ) make a boolean matrix that differentiate the exaples and non-examples, also the matrix have to be stored in an efficient way
+3. ) its required to build the base case before computing a matrix of a bigger magnitude (idea from DP)
+4. ) ***effiecient method of checking the tolerance given n points (currently brute force, maybe theres a better method)
 
 since the main idea is to reduce the number of computation and storage, we will come up with this example
 
