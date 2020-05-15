@@ -115,13 +115,15 @@ after multiplying all of the above, we get  (2^n)  * (LL^2 choose n-2) * (1/2 * 
 
 ### Andrew's monotone chain
 sort points by the coordinate, then find the top part of the hull, then find the bottom border of the hull, then join the border
+
 similar to graham's scan, but since we dont have to calculate the angle, this is faster.
+
 the runtime of O(n * log n) comes from the sorting, if the points are sorted, then it is easy to find the next point that makes the top or bottom border
 
 ### algorithm (1) , I dont know the name for this
 draw a line from one point on the convex hull to the point, p, that we want to check membership. 
 
-* the cross product's sign tells us if the second vector is on the left or the right of the vector
+** the cross product's sign tells us if the second vector is on the left or the right of the vector
 
 we use the fact above to do a divide and conquer algorithm to find the 3 points on the set, that makes a triangle, then check if the point in question is on the same direction for all 3 sides
 
