@@ -73,5 +73,9 @@ def stirling_formula(n):
 
 def main():
     print(multinomial([1, 1, 1]))
+    for i in [n*n for n in range(10)]:
+        #print(i, choose(i, 5))
+
+
 if __name__ == "__main__":
     main()

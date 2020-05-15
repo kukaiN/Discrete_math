@@ -95,47 +95,57 @@ def reducible_slope(del_x, del_y):
         return 0
     else: # if there's a reducible slope, then theres an integer point in between, given both input points have integer coordinates
         return reduced_slope
+
+def Z_radon_counter_example(min_x, max_x, number_of_points, dimension):
+    t1 = time.time()
+    found_counter_examples = []
+    number_generator = []
     
+def partition_set(integer_tup_set, set_size, partition_size):
+    pass
 
 def find_examples(min_x, max_x, number_of_points, pickle_name):
     t1 = time.time()
-    data_points = []
-
+    found_examples = []
     for index, candidate_points in enumerate(set_of_points(min_x, max_x, 2,  number_of_points)):  
         if index%100000 == 0: print(index)
-        break_bool = False
-        for partition in combinations(candidate_points, 2): # partition contains two points that we want to use
+        sets_overlap = False
+        
+        for ind, partition in enumerate(combinations(candidate_points, 2)): # partition contains two points that we want to use
             # find the slope of the integer points
-            p1 = partition[0]
-            p2 = partition[1]
-            delta_x = p2[0] - p1[0]
-            delta_y = p2[1] - p1[1]
+            p1, p2 = partition
+            delta_x, delta_y = p2[0] - p1[0], p2[1] - p1[1]
             points_in_between = reducible_slope(delta_x, delta_y)
             
-            # integer points on the line
+            if points_in_between:
+                delta_x, delta_y = int(delta_x/points_in_between), int(delta_y/points_in_between)
             points = [[p1[0]+i*delta_x, p1[1]+i*delta_y] for i in range(points_in_between+1)] if points_in_between else partition
+            # integer points on the line
+          
             # the other set of 3 points that makes a convex hull
             other_partition = np.array([point for point in candidate_points if point not in partition])
-
             for point in points:
                 if in_hull(other_partition, np.array(point)):
-                        break_bool = True
-                if break_bool:
-                    break
-            # since we need a set that dosnt have an integer point we need to exit out of the loop again
-            if break_bool:
-                break
+                        sets_overlap = True
         # go to next candidate points
-
-        if not break_bool: # we couldnt find integer points so we found an example     
-            data_points.append(list(candidate_points))
-
-    if data_points != []:
+        if not sets_overlap:
+            found_examples.append(candidate_points)
+    if found_examples != []:
         df = pd.DataFrame(data_points, columns=["p1", "p2", "p3", "p4", "p5"])
         save_pickle(pickle_name, df)
     time_took = t1-time.time() 
     print(time_took)
     print("index", index)
+    return found_examples
+
+def probable_intersection(list_of_sets_of_points, number_of_set):
+    """
+    returns m, n and the bottom left point of a m x n grid where the intersection would lie if it exist
+    if you have sets A and B that intersect on the 2d space, 
+    then you can restrict the search space by the minimum of the maximum x and y and the maximum of the minimum of x and y of the sets
+
+    its really easy to get the max and min, per set
+    """
 
 
 def filter_same_shape(data, min_x, max_x):
@@ -162,24 +172,42 @@ def filter_same_shape(data, min_x, max_x):
             if temp_bool:
                 set_of_shapes.append((convex_set , length_list))
 
-    print(len(set_of_shapes))
+    
     return set_of_shapes
 
+def rotations(points):
+    new_points = [points]
+    new_points.append([[-point[1], point[0]] for point in points])
+    new_points.append([[-point[0], -point[1]] for point in points])
+    new_points.append([[point[1], -point[0]] for point in points])
+    return new_points
+
+def xy_flip(points):
+    return [[point[1], point[0]] for point in points]
+
+
 def filter_same_shape2(data, min_x, max_x):
+    variation_set = []
     unique_sets = []
     for potential_set in data:
-        smallest_point = get_smallest_point(potential_set)
-        x_sm, y_sm = smallest_point
-        scaled_set = [(x-x_sm, y-y_sm) for (x, y) in data]
-        break_bool = True
-        for known_set in unique_sets:
-            if break_bool:
-                if set(known_set) == set(scaled_data):
-                    break_bool = False
-                    break
-        if break_bool:
-            unique_sets.append(scaled_data)
-    print(len(unique_sets))
+        add_to_set = True
+       
+        for transformed_set in rotations(potential_set) + rotations(xy_flip(potential_set)):
+            smallest_point = get_smallest_point(transformed_set)
+            x_sm, y_sm = smallest_point
+            
+            scaled_data = [(point[0]-x_sm, point[1]-y_sm) for point in transformed_set]
+            break_bool = True
+            for known_set in variation_set:
+                if break_bool:
+                    if set(known_set) == set(scaled_data):
+                        break_bool = False
+                    
+                variation_set.append(scaled_data)
+            if not break_bool:
+                add_to_set = False
+        if add_to_set:
+            unique_sets.append(potential_set)
     return unique_sets
 
 def play_with_pickle(current_dir, min_x, max_x):
@@ -208,6 +236,16 @@ def main():
     repetition = 1
     pickle_name = current_dir+"tverberg"
     pickle_name+=".pkl"
+
+    """
+    examplesss = [[(0, 0), (0, 1), (1, 0), (2, 3), (3, 2)], [(0, 0), (0, 1), (1, 2), (2, 0), (3, 2)], [(0, 0), (0, 1), (1, 2), (3, 0), (3, 2)], [(0, 0), (0, 1), (1, 3), (2, 0), (3, 2)], [(0, 0), (0, 1), (1, 3), (3, 0), (3, 2)], [(0, 0), (0, 1), (2, 0), (2, 3), (3, 2)], [(0, 0), (0, 1), (2, 3), (3, 0), (3, 2)], [(0, 0), (0, 2), (1, 0), (2, 1), (2, 3)], [(0, 0), (0, 2), (1, 0), (2, 3), (3, 1)], [(0, 0), (0, 2), (1, 0), (2, 3), (3, 2)], [(0, 0), (0, 2), (1, 3), (2, 0), (2, 3)], [(0, 0), (0, 2), (1, 3), (2, 1), (2, 3)], [(0, 0), (0, 2), (1, 3), (2, 1), (3, 3)], [(0, 0), (0, 2), (1, 3), (2, 3), (3, 0)], [(0, 0), (0, 2), (1, 3), (2, 3), (3, 1)], [(0, 0), (0, 2), (1, 3), (3, 0), (3, 1)], [(0, 0), (0, 2), (1, 3), (3, 0), (3, 3)], [(0, 0), (0, 2), (2, 0), (3, 1), (3, 2)], [(0, 0), (0, 2), (2, 2), (3, 0), (3, 1)], [(0, 0), (0, 2), (2, 3), (3, 0), (3, 1)], [(0, 0), (0, 3), (1, 0), (2, 1), (2, 3)], [(0, 0), (0, 3), (1, 0), (2, 3), (3, 1)], [(0, 0), (0, 3), (1, 0), (2, 3), (3, 2)], [(0, 0), (0, 3), (1, 3), (2, 0), (2, 2)], [(0, 0), (0, 3), (1, 3), (2, 0), (3, 1)], [(0, 0), (0, 3), (1, 3), (2, 0), (3, 2)], [(0, 0), (0, 3), (2, 0), (3, 1), (3, 2)], [(0, 0), (0, 3), (2, 0), (3, 1), (3, 3)], [(0, 0), (0, 3), (2, 3), (3, 0), (3, 2)], [(0, 0), (0, 3), (2, 3), (3, 1), (3, 2)], [(0, 0), (1, 2), (2, 0), (3, 1), (3, 2)], [(0, 0), (1, 2), (2, 0), (3, 1), (3, 3)], [(0, 0), (1, 3), (2, 0), (3, 1), (3, 2)], [(0, 0), (1, 3), (2, 3), (3, 0), (3, 2)], [(0, 0), (0, 1), (1, -1), (2, 1), (3, -1)], [(0, 0), (0, 1), (1, -1), (2, 2), (3, -1)], [(0, 0), (0, 1), (1, -1), (3, -1), (3, 1)], [(0, 0), (0, 1), (1, -1), (3, -1), (3, 2)], [(0, 0), (0, 1), (1, 2), (2, -1), (3, 2)], [(0, 0), (0, 1), (1, 2), (3, -1), (3, 2)], [(0, 0), (0, 2), (1, -1), (2, -1), (2, 1)], [(0, 0), (0, 2), (1, -1), (2, -1), (2, 2)], [(0, 0), (0, 2), (1, -1), (2, -1), (3, 1)], [(0, 0), (0, 2), (1, -1), (2, -1), (3, 2)], [(0, 0), (0, 2), (1, -1), (2, 1), (3, -1)], [(0, 0), (0, 2), (1, -1), (3, -1), (3, 2)], [(0, 0), (0, 2), (1, -1), (3, 1), (3, 2)], [(0, 0), (0, 2), (1, 2), (2, -1), (2, 1)], [(0, 0), (0, 2), (1, 2), (2, -1), (3, 0)], [(0, 0), (0, 2), (1, 2), (2, -1), (3, 1)], [(0, 0), (0, 2), (2, -1), (3, 1), (3, 2)], [(0, 0), (1, -1), (1, 2), (3, 1), (3, 2)], [(0, 0), (1, -1), (2, 2), (3, -1), (3, 2)], [(0, 0), (1, -1), (2, 2), (3, 0), (3, 2)], [(0, 0), (1, -1), (2, 2), (3, 1), (3, 2)], [(0, 0), 
+(1, 2), (2, -1), (3, -1), (3, 1)], [(0, 0), (1, 2), (2, -1), (3, -1), (3, 2)], [(0, 0), (1, 2), (2, -1), (3, 1), (3, 2)], [(0, 0), (1, 2), (2, 2), (3, -1), (3, 1)], [(0, 0), (0, 1), (1, -2), (2, 1), (3, -1)], [(0, 0), (0, 1), (1, -2), (3, -1), (3, 1)], [(0, 0), (0, 1), (1, 1), (2, -2), (3, -1)], [(0, 0), (0, 1), (2, -2), (2, 1), (3, -1)], [(0, 0), (0, 1), (2, -2), (3, -1), (3, 1)], [(0, 0), (1, -2), (1, 1), (3, -2), (3, -1)], [(0, 0), (1, -2), (2, -2), (3, -1), (3, 1)], [(0, 0), (1, -2), (2, 0), (3, -2), (3, -1)], [(0, 0), (1, -2), (2, 1), (3, -2), (3, -1)], [(0, 0), (1, -2), (2, 1), (3, -2), (3, 1)], [(0, 0), (1, -2), (2, 1), (3, -1), (3, 1)], [(0, 0), (1, 1), (2, -2), (3, -2), (3, -1)], [(0, 0), (1, 1), (2, -2), (3, -2), (3, 0)], [(0, 0), (1, 1), (2, -2), (3, -2), (3, 1)], [(0, 0), (1, -3), (2, -3), (3, -2), (3, 0)], [(0, 0), 
+(1, -3), (2, 0), (3, -2), (3, -1)], [(0, 0), (1, -2), (2, 0), (3, -3), (3, -1)]]
+
+
+
+    """
+    examplesss = [[(0,0), (0, 1), (1, 1)], [(0, 0), (1, 0), (1, 1)]]
     """
     for i in range(repetition):
         stuff = list(set((random.randint(min_x, max_x), random.randint(min_x, max_x)) for _ in range(num_of_points)))
@@ -219,10 +257,18 @@ def main():
         print(in_hull(convex_set, point_in_set))
         #visual.visualize(stuff, exterior_set, 2, maxVal=max_x, minVal=min_x, angles=True, min_point=smallest_point, other_point=True, point_considered=point_in_set)
     """
-    max_x = 6
+    max_x = 4
     number_of_points = 5
-    #find_examples(min_x, max_x, number_of_points, pickle_name)
-    play_with_pickle(current_dir, min_x, max_x)
+
+    min_x = 0
+    max_x = 8
+    num_of_points = 5
+
+    examples = find_examples(min_x, max_x, number_of_points, pickle_name)
+  
+    filtered_exmaples = filter_same_shape2(examples, 0 , 10)
+    print(filtered_exmaples)
+    #play_with_pickle(current_dir, min_x, max_x)
 
     
 if __name__ == "__main__":
