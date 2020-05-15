@@ -59,6 +59,7 @@ since the search space is going to be the shape below, we will use two generator
 one for the points in the square and one for the skewed trapezoidal shape
 
 This method will be abbreviated as the t/s method, standing for trapezoid/square method for saving computation
+
     6    __________________
     5   |                /
     4   |              /    
@@ -125,4 +126,5 @@ draw a line from one point on the convex hull to the point, p, that we want to c
 we use the fact above to do a divide and conquer algorithm to find the 3 points on the set, that makes a triangle, then check if the point in question is on the same direction for all 3 sides
 
 the divide and conquer decreases the number of test cases by 2 at each step so the runtime is O(log n)
+
 
