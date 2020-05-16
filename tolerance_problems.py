@@ -97,6 +97,10 @@ def convex_hull(points):
         return lower[:-1] + upper
     return lower[:-1] + upper[:-1]
 
+def inside_set(queue_of_set, points):
+    """
+    this is a O(log n) algorithm of checking if the point is in the set
+    """
 
 def start_base_case(n = 7, ll = 4, t = 1, k = 2, d = 2):
     # since the search space is going to be the shape below, we will use two generators,
@@ -140,7 +144,10 @@ def start_base_case(n = 7, ll = 4, t = 1, k = 2, d = 2):
                     
                     x = convex_hull(per_n_points+fixed_points)
                     for int_z in [(k, g) for g in range(grid_length+1) for k in range(grid_length+1)]:
-                        
+                        if inside_set(x, int_z):
+                            pass
+                        else:
+                            pass  
 
 
 

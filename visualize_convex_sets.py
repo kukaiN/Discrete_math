@@ -3,15 +3,28 @@ import numpy as np
 import random
 import itertools
 
-def visualize(points, convex_border, dimensions, maxVal=None, minVal=None, linestyles=["rx","b-", "bx"], ticks=[5, 1], angles=False, min_point = [0,0], other_point=False, point_considered=[0,0]):
-    if maxVal == None: maxVal = max(max(points, key = lambda a: a[0]), max(points, key = lambda a: a[1]))
-    if minVal == None: minVal = min(min(points, key = lambda a: a[0]), min(points, key = lambda a: a[1]))
+def Max_Min_of_tuple(points):
+    max_value = points[0][0]
+    min_value = points[0][0]
+    for point in points:
+        for coordinate_value in point:
+            if coordinate_value > max_value:
+                max_value = coordinate_value
+            if coordinate_value < min_value:
+                min_value = coordinate_value
+    return (max_value, min_value)
+
+def visualize(points, convex_border, dimensions,
+            maxVal=None, minVal=None, linestyles=["rx","b-", "bx"], ticks=[5, 1], angles=False, min_point = [0,0], other_point=False, point_considered=[0,0], save_plt=False, filename="default.png"):
+    if maxVal == None: maxVal = Max_Min_of_tuple(points)[0]
+    if minVal == None: minVal =  Max_Min_of_tuple(points)[1]
     
     fig = plt.figure()
     ax = fig.add_subplot(1, 1, 1)
     if other_point:
         minVal = min(minVal, min(point_considered))
         maxVal= max(maxVal+1, max(point_considered))
+    print(minVal, maxVal)
     major_ticks = np.arange(minVal, maxVal+1, ticks[0])
     minor_ticks = np.arange(minVal, maxVal+1, ticks[1])
     ax.set_xticks(major_ticks)
@@ -32,13 +45,46 @@ def visualize(points, convex_border, dimensions, maxVal=None, minVal=None, lines
             plt.plot(x_list, y_list, "--r")
     if other_point:
         plt.plot(point_considered[0], point_considered[1], "yx")
-    plt.show()
+    if save_plt:
+        plt.savefig(filename)
+    else:
+        plt.show()
 
+def save_examples(examples):
+    """
+    examplesss = [[(0, 0), (0, 1), (1, 0), (2, 3), (3, 2)], [(0, 0), (0, 1), (1, 2), (2, 0), (3, 2)], [(0, 0), (0, 1), (1, 2), (3, 0), (3, 2)], 
+    [(0, 0), (0, 1), (1, 3), (2, 0), (3, 2)], [(0, 0), (0, 1), (1, 3), (3, 0), (3, 2)], [(0, 0), (0, 1), (2, 0), (2, 3), (3, 2)], [(0, 0), (0, 1), (2, 3), (3, 0), (3, 2)], 
+    [(0, 0), (0, 2), (1, 0), (2, 1), (2, 3)], [(0, 0), (0, 2), (1, 0), (2, 3), (3, 1)], [(0, 0), (0, 2), (1, 0), (2, 3), (3, 2)], [(0, 0), (0, 2), (1, 3), (2, 0), (2, 3)],
+    [(0, 0), (0, 2), (1, 3), (2, 1), (2, 3)], [(0, 0), (0, 2), (1, 3), (2, 1), (3, 3)], [(0, 0), (0, 2), (1, 3), (2, 3), (3, 0)], [(0, 0), (0, 2), (1, 3), (2, 3), (3, 1)], 
+    [(0, 0), (0, 2), (1, 3), (3, 0), (3, 1)], [(0, 0), (0, 2), (1, 3), (3, 0), (3, 3)], [(0, 0), (0, 2), (2, 0), (3, 1), (3, 2)], [(0, 0), (0, 2), (2, 2), (3, 0), (3, 1)], 
+    [(0, 0), (0, 2), (2, 3), (3, 0), (3, 1)], [(0, 0), (0, 3), (1, 0), (2, 1), (2, 3)], [(0, 0), (0, 3), (1, 0), (2, 3), (3, 1)], [(0, 0), (0, 3), (1, 0), (2, 3), (3, 2)], 
+    [(0, 0), (0, 3), (1, 3), (2, 0), (2, 2)], [(0, 0), (0, 3), (1, 3), (2, 0), (3, 1)], [(0, 0), (0, 3), (1, 3), (2, 0), (3, 2)], [(0, 0), (0, 3), (2, 0), (3, 1), (3, 2)], 
+    [(0, 0), (0, 3), (2, 0), (3, 1), (3, 3)], [(0, 0), (0, 3), (2, 3), (3, 0), (3, 2)], [(0, 0), (0, 3), (2, 3), (3, 1), (3, 2)], [(0, 0), (1, 2), (2, 0), (3, 1), (3, 2)], 
+    [(0, 0), (1, 2), (2, 0), (3, 1), (3, 3)], [(0, 0), (1, 3), (2, 0), (3, 1), (3, 2)], [(0, 0), (1, 3), (2, 3), (3, 0), (3, 2)], [(0, 0), (0, 1), (1, -1), (2, 1), (3, -1)], 
+    [(0, 0), (0, 1), (1, -1), (2, 2), (3, -1)], [(0, 0), (0, 1), (1, -1), (3, -1), (3, 1)], [(0, 0), (0, 1), (1, -1), (3, -1), (3, 2)], [(0, 0), (0, 1), (1, 2), (2, -1), (3, 2)],
+    [(0, 0), (0, 1), (1, 2), (3, -1), (3, 2)], [(0, 0), (0, 2), (1, -1), (2, -1), (2, 1)], [(0, 0), (0, 2), (1, -1), (2, -1), (2, 2)], [(0, 0), (0, 2), (1, -1), (2, -1), (3, 1)],
+    [(0, 0), (0, 2), (1, -1), (2, -1), (3, 2)], [(0, 0), (0, 2), (1, -1), (2, 1), (3, -1)], [(0, 0), (0, 2), (1, -1), (3, -1), (3, 2)], [(0, 0), (0, 2), (1, -1), (3, 1), (3, 2)], 
+    [(0, 0), (0, 2), (1, 2), (2, -1), (2, 1)], [(0, 0), (0, 2), (1, 2), (2, -1), (3, 0)], [(0, 0), (0, 2), (1, 2), (2, -1), (3, 1)], [(0, 0), (0, 2), (2, -1), (3, 1), (3, 2)], 
+    [(0, 0), (1, -1), (1, 2), (3, 1), (3, 2)], [(0, 0), (1, -1), (2, 2), (3, -1), (3, 2)], [(0, 0), (1, -1), (2, 2), (3, 0), (3, 2)], [(0, 0), (1, -1), (2, 2), (3, 1), (3, 2)],
+    [(0, 0), (1, 2), (2, -1), (3, -1), (3, 1)], [(0, 0), (1, 2), (2, -1), (3, -1), (3, 2)], [(0, 0), (1, 2), (2, -1), (3, 1), (3, 2)], [(0, 0), (1, 2), (2, 2), (3, -1), (3, 1)],
+    [(0, 0), (0, 1), (1, -2), (2, 1), (3, -1)], [(0, 0), (0, 1), (1, -2), (3, -1), (3, 1)], [(0, 0), (0, 1), (1, 1), (2, -2), (3, -1)], [(0, 0), (0, 1), (2, -2), (2, 1), (3, -1)], 
+    [(0, 0), (0, 1), (2, -2), (3, -1), (3, 1)], [(0, 0), (1, -2), (1, 1), (3, -2), (3, -1)], [(0, 0), (1, -2), (2, -2), (3, -1), (3, 1)], [(0, 0), (1, -2), (2, 0), (3, -2), (3, -1)],
+    [(0, 0), (1, -2), (2, 1), (3, -2), (3, -1)], [(0, 0), (1, -2), (2, 1), (3, -2), (3, 1)], [(0, 0), (1, -2), (2, 1), (3, -1), (3, 1)], [(0, 0), (1, 1), (2, -2), (3, -2), (3, -1)], 
+    [(0, 0), (1, 1), (2, -2), (3, -2), (3, 0)], [(0, 0), (1, 1), (2, -2), (3, -2), (3, 1)], [(0, 0), (1, -3), (2, -3), (3, -2), (3, 0)], [(0, 0), (1, -3), (2, 0), (3, -2), (3, -1)],
+    [(0, 0), (1, -2), (2, 0), (3, -3), (3, -1)]]
+    """
+    return
+    base_name = "set_with_5_points_"
+    foldername = "collection_of_examples\\"
+    for counter, sets in enumerate(examplesss):
+        name = foldername + base_name + str(counter) + ".png"
+        visualize(sets, sets, 2, save_plt=True, filename=name) 
 
 def main():
     #for points in [itertools.product]:
-    #    pass
     pass
 
+    
+     
 if __name__ == "__main__":
     main()

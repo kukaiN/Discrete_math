@@ -109,6 +109,12 @@ calculation
 
 after multiplying all of the above, we get  (2^n)  * (LL^2 choose n-2) * (1/2 * n^2)  *  ( O(n * log n) * LL^1.5 (log n))
 
+# breaking the tolerance
+we can skip 1 point
+minimize 2points
+ignore cases with no intersection
+
+
 
 
 ## Algorithm explanation:
