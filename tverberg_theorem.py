@@ -12,7 +12,7 @@ import pandas as pd
 import time
 
 def set_of_points(min_num, max_num, dimensions, num_of_points):
-    return combinations(product(range(min_num, max_num+1), repeat=dimensions), num_of_points)
+    return itertools.combinations(itertools.product(range(min_num, max_num+1), repeat=dimensions), num_of_points)
 
 def CCW_from_determinant(point1, point2, point3):
     return (point1[0]-point2[0])*(point3[1]-point2[1]) - (point1[1]-point2[1])*(point3[0]-point2[0])

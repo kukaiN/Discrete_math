@@ -1,7 +1,10 @@
 # Discrete_math
  some stuff that's related to discrete math in Python
 
+# t-tolerance definition:
+if there exist a set of n points in a plane, s.t. we can remove any t points and if all allowed k-partitions continue to have at least one ineger point in it's intersection, then its called t-tolerent
 
+make n points, if we remove t points and if we find an empty intersection, then go to n+1 points
 
 recurrence relation of generating integer points for programs that only cares about orientation
 
