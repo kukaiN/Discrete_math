@@ -7,6 +7,7 @@ import math
 import scipy.optimize as sci_op
 import visualize_convex_sets as visual
 import time
+import random
 
 def fast_list_merge(list_a, list_b):
     # this method of merging was added in python 3.7, 
@@ -72,7 +73,7 @@ def convex_hull(points):
     # Sort the points lexicographically (tuples are compared lexicographically).
     # Remove duplicates to detect the case we have just one unique point.
     points = sorted(points)
-    print(points)
+    #print(points)
     # 2D cross product of OA and OB vectors, i.e. z-component of their 3D cross product.
     # Returns a positive value, if OAB makes a counter-clockwise turn,
     # negative for clockwise turn, and zero if the points are collinear.
@@ -101,6 +102,7 @@ def inside_set(queue_of_set, points):
     """
     this is a O(log n) algorithm of checking if the point is in the set
     """
+    for ind in range()
 
 def start_base_case(n = 7, ll = 4, t = 1, k = 2, d = 2):
     # since the search space is going to be the shape below, we will use two generators,
@@ -145,14 +147,9 @@ def start_base_case(n = 7, ll = 4, t = 1, k = 2, d = 2):
                     x = convex_hull(per_n_points+fixed_points)
                     for int_z in [(k, g) for g in range(grid_length+1) for k in range(grid_length+1)]:
                         if inside_set(x, int_z):
-                            pass
+                            print("i")
                         else:
-                            pass  
-
-
-
-
-
+                            print("2"*20)
                     #visual.visualize(per_n_points+fixed_points, x, 2, 10, 0)
                     #tolerance(list(permutation_of_n_points) + fixed_points, n ,  t, d)
                     break
@@ -167,16 +164,31 @@ def start_base_case(n = 7, ll = 4, t = 1, k = 2, d = 2):
 
 def main():
     d = 2
-    n = 7
+    n = 12
     t = 1
     k = 2
     ll = 5
-    problem_parameters = [d, n, t, k, ll]
-    start_base_case(n = 7, ll = 4)
-    t1 = time.time()
+    #problem_parameters = [d, n, t, k, ll]
+    #start_base_case(n=12, ll = 8)
+    #t1 = time.time()
     
-
-
+    list_x = [(random.randint(0, 100), random.randint(0, 100)) for _ in range(12)]
+    entry = ([a[0] for a in list_x] + [a[1] for a in list_x])
+    max_x, min_x = max(entry), min(entry)
+    collection_of_points = [(a, b) for a in range(min_x, max_x+1) for b in range(min_x, max_x+1)]
+    for point in list_x:
+        new_list = set(list_x) - set(point)
+        for n in range(2, 6):
+            for part_A in combinations(list(new_list), n ):
+                part_B = list(new_list - set(part_A))
+                conv_A, conv_B = convex_hull(part_A), convex_hull(part_B)
+                point_in_A = [a for a in collection_of_points if inside_set(conv_A, a)]
+                point_in_AB = [a for a in point_in_A if inside_set(conv_B, a)]
+                if point_in_AB != []:
+                    print("a")
+                else:
+                    #print("b"*20)
+                    pass
 
 if __name__ == "__main__":
     main()
