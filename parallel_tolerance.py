@@ -1,6 +1,7 @@
 from itertools import product, combinations
 
-
+def doignonTheorem():
+    pass
 
 
 

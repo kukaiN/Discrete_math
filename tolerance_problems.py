@@ -98,11 +98,14 @@ def convex_hull(points):
         return lower[:-1] + upper
     return lower[:-1] + upper[:-1]
 
-def inside_set(queue_of_set, points):
+def inside_set(queue_of_set, point):
     """
     this is a O(log n) algorithm of checking if the point is in the set
     """
-    for ind in range()
+    for ind in range(len(queue_of_set)):
+        if cross(queue_of_set[0], queue_of_set[1], point) > 0:
+            return False
+    return True
 
 def start_base_case(n = 7, ll = 4, t = 1, k = 2, d = 2):
     # since the search space is going to be the shape below, we will use two generators,
@@ -171,24 +174,48 @@ def main():
     #problem_parameters = [d, n, t, k, ll]
     #start_base_case(n=12, ll = 8)
     #t1 = time.time()
+    count = 12
+    list_x = [(random.randint(0, 50), random.randint(0, 50)) for _ in range(count)]
     
-    list_x = [(random.randint(0, 100), random.randint(0, 100)) for _ in range(12)]
     entry = ([a[0] for a in list_x] + [a[1] for a in list_x])
     max_x, min_x = max(entry), min(entry)
     collection_of_points = [(a, b) for a in range(min_x, max_x+1) for b in range(min_x, max_x+1)]
+    print(len(list_x))
+    print(list_x)
+    print(entry)
+    print(max_x, min_x)
+
+    #print(collection_of_points)
     for point in list_x:
-        new_list = set(list_x) - set(point)
-        for n in range(2, 6):
-            for part_A in combinations(list(new_list), n ):
+        counter =0
+        loop_counter = 0
+        difference = 0
+        print("running", point)
+        new_list = set(list_x) #- set([point])
+        print(len(new_list), new_list, point)
+        for n in range(2, 6+1):
+            for part_A in combinations(list(new_list), n):
+                loop_counter+=1
                 part_B = list(new_list - set(part_A))
                 conv_A, conv_B = convex_hull(part_A), convex_hull(part_B)
                 point_in_A = [a for a in collection_of_points if inside_set(conv_A, a)]
                 point_in_AB = [a for a in point_in_A if inside_set(conv_B, a)]
                 if point_in_AB != []:
-                    print("a")
+                    #print("a")
+                    counter +=1
                 else:
                     #print("b"*20)
                     pass
+                if loop_counter != counter+difference:
+                    print(point_in_AB)
+                    difference+=1
+        
+        print(counter, loop_counter)
+        break
+    print("finished")
+
+
+
 
 if __name__ == "__main__":
     main()

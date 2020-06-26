@@ -10,6 +10,7 @@ import os
 import pickle
 import pandas as pd
 import time
+import itertools
 
 def set_of_points(min_num, max_num, dimensions, num_of_points):
     return itertools.combinations(itertools.product(range(min_num, max_num+1), repeat=dimensions), num_of_points)
@@ -246,7 +247,7 @@ def main():
 
     """
     examplesss = [[(0,0), (0, 1), (1, 1)], [(0, 0), (1, 0), (1, 1)]]
-    """
+    
     for i in range(repetition):
         stuff = list(set((random.randint(min_x, max_x), random.randint(min_x, max_x)) for _ in range(num_of_points)))
         exterior_set, smallest_point = grahams_method(stuff, num_of_points,min_x, max_x, list_sorted=False)
@@ -256,7 +257,7 @@ def main():
 
         print(in_hull(convex_set, point_in_set))
         #visual.visualize(stuff, exterior_set, 2, maxVal=max_x, minVal=min_x, angles=True, min_point=smallest_point, other_point=True, point_considered=point_in_set)
-    """
+    
     max_x = 4
     number_of_points = 5
 
